@@ -1,0 +1,36 @@
+/* Base button styles */
+.btn-base {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: bold;
+  color: white;
+  transition: filter 0.2s;
+}
+
+.btn-base:hover {
+  filter: brightness(85%);
+}
+
+/* Button color variants */
+.btn-purple {
+  background: #6c07db;
+}
+
+.btn-gray {
+  background: #666;
+}
+
+.btn-orange {
+  background: #f38229;
+}
+
+.btn-pink {
+  background: #b73288;
+}
+
+.btn-light-blue {
+  background: #7acfde;
+}

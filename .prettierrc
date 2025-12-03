@@ -1,0 +1,25 @@
+{
+  "semi": false,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    "^react",
+    "^@testing-library",
+    "^[a-zA-Z]",
+    "^@/",
+    "^[./]",
+    ".css$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
