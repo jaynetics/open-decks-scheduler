@@ -148,6 +148,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       <Button color="gray" text="Hide Settings" onClick={onHideSettings} />
 
       {raffleWarning}
+
+      <a href="http://github.com/jaynetics/open-decks-scheduler">Source code</a>
     </div>
   )
 }
