@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "jsx": "react-jsx",
     "outDir": "./dist",
     "rootDir": "./src",
@@ -22,12 +26,27 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@types/*": [
+        "src/types/*"
+      ]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+  "include": [
+    "src/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

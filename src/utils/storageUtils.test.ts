@@ -1,3 +1,5 @@
+import { renderHook } from '@testing-library/react'
+
 import { DEFAULTS } from '@/constants'
 
 import {
@@ -8,6 +10,7 @@ import {
   errorMessage,
   generateShareableURL,
   loadAppState,
+  useAppStateFromURL,
 } from './storageUtils'
 
 describe('Storage Utilities', () => {
@@ -275,6 +278,28 @@ describe('Storage Utilities', () => {
       expect(errorMessage(null)).toBe('Unknown error')
       expect(errorMessage(undefined)).toBe('Unknown error')
       expect(errorMessage({ message: 'not an Error instance' })).toBe('Unknown error')
+    })
+  })
+
+  describe('useAppStateFromURL', () => {
+    it('should return default state and clear hash on mount', () => {
+      window.location.hash = '#some-hash'
+      const state: PersistedAppState = { v: 1, d: { startHour: 10 } as PersistedAppData }
+      window.location.hash = '#' + compressState(state)
+
+      const { result } = renderHook(() => useAppStateFromURL())
+
+      expect(result.current.startHour).toBe(10)
+      expect(window.location.hash).toBe('')
+    })
+
+    it('should memoize the state', () => {
+      const { result, rerender } = renderHook(() => useAppStateFromURL())
+      const initialResult = result.current
+
+      rerender()
+
+      expect(result.current).toBe(initialResult)
     })
   })
 })

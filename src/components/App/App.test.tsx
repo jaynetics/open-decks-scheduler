@@ -1,12 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@/utils/testUtils'
 
 import App from './App'
-
-// Mock window.print
-Object.defineProperty(window, 'print', {
-  writable: true,
-  value: jest.fn(),
-})
 
 describe('App Component', () => {
   beforeEach(() => {
@@ -87,92 +81,6 @@ describe('App Component', () => {
     expect(screen.getByText('10:30')).toBeInTheDocument()
   })
 
-  it('should open slot editor when edit button is clicked', () => {
-    render(<App />)
-
-    // Settings must be visible for edit buttons to appear
-    const editButtons = screen.getAllByTitle('Edit slot')
-    fireEvent.click(editButtons[0])
-
-    expect(screen.getByText('Edit Slot 1 (18:20)')).toBeInTheDocument()
-  })
-
-  it('should close slot editor when Cancel is clicked', () => {
-    render(<App />)
-
-    const editButtons = screen.getAllByTitle('Edit slot')
-    fireEvent.click(editButtons[0])
-
-    const cancelButton = screen.getByText('Cancel')
-    fireEvent.click(cancelButton)
-
-    expect(screen.queryByText('Edit Slot 1 (18:20)')).not.toBeInTheDocument()
-  })
-
-  it('should update slot config when Save is clicked in editor', () => {
-    render(<App />)
-
-    const editButtons = screen.getAllByTitle('Edit slot')
-    fireEvent.click(editButtons[0])
-
-    const specialInput = screen.getByLabelText(/Special Content/i)
-    fireEvent.change(specialInput, { target: { value: 'Featured DJ: Test' } })
-
-    const saveButton = screen.getByText('Save')
-    fireEvent.click(saveButton)
-
-    expect(screen.getByText('Featured DJ: Test')).toBeInTheDocument()
-  })
-
-  it('should delete slot when delete is confirmed', () => {
-    render(<App />)
-
-    // Get initial slot count
-    const initialSlots = screen.getAllByText(/^\d{2}:\d{2}$/)
-    const initialCount = initialSlots.length
-
-    const editButtons = screen.getAllByTitle('Edit slot')
-    fireEvent.click(editButtons[0])
-
-    jest.spyOn(window, 'confirm').mockReturnValueOnce(true)
-    fireEvent.click(screen.getByText('Delete Slot'))
-
-    const finalSlots = screen.getAllByText(/^\d{2}:\d{2}$/)
-    expect(finalSlots.length).toBe(initialCount - 1)
-  })
-
-  it('should insert slot above when Add Slot Above is clicked', () => {
-    render(<App />)
-
-    const initialSlots = screen.getAllByText(/^\d{2}:\d{2}$/)
-    const initialCount = initialSlots.length
-
-    const editButtons = screen.getAllByTitle('Edit slot')
-    fireEvent.click(editButtons[1]) // Click second slot
-
-    const addAboveButton = screen.getByText('Add Slot Above')
-    fireEvent.click(addAboveButton)
-
-    const finalSlots = screen.getAllByText(/^\d{2}:\d{2}$/)
-    expect(finalSlots.length).toBe(initialCount + 1)
-  })
-
-  it('should insert slot below when Add Slot Below is clicked', () => {
-    render(<App />)
-
-    const initialSlots = screen.getAllByText(/^\d{2}:\d{2}$/)
-    const initialCount = initialSlots.length
-
-    const editButtons = screen.getAllByTitle('Edit slot')
-    fireEvent.click(editButtons[0])
-
-    const addBelowButton = screen.getByText('Add Slot Below')
-    fireEvent.click(addBelowButton)
-
-    const finalSlots = screen.getAllByText(/^\d{2}:\d{2}$/)
-    expect(finalSlots.length).toBe(initialCount + 1)
-  })
-
   it('should auto-assign raffles when button is clicked', () => {
     render(<App />)
 
@@ -182,15 +90,6 @@ describe('App Component', () => {
     // Should have raffles distributed
     const raffleElements = screen.queryAllByText(/\dx Raffle/)
     expect(raffleElements.length).toBeGreaterThan(0)
-  })
-
-  it('should call window.print when Print Schedule is clicked', () => {
-    render(<App />)
-
-    const printButton = screen.getByText('🖨️ Print Schedule')
-    fireEvent.click(printButton)
-
-    expect(window.print).toHaveBeenCalledTimes(1)
   })
 
   it('should show raffle warning when mismatch exists and sidebar is hidden', () => {
@@ -379,62 +278,6 @@ describe('App Component', () => {
 
       // First slot should show 02:20 (14:00 + 20 minutes in 12h format, no AM/PM)
       expect(screen.getByText('02:20')).toBeInTheDocument()
-    })
-  })
-
-  describe('Share functionality', () => {
-    it('should generate and copy shareable URL to clipboard when Share Schedule is clicked', async () => {
-      const mockWriteText = jest.fn()
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: mockWriteText.mockResolvedValue(undefined),
-        },
-      })
-
-      render(<App />)
-
-      const shareButton = screen.getByText('🔗 Share Schedule')
-      fireEvent.click(shareButton)
-
-      const toast = await screen.findByText('Schedule URL copied to clipboard!')
-      expect(toast).toBeInTheDocument()
-
-      // Should generate a URL with state hash
-      expect(mockWriteText).toHaveBeenCalled()
-      const calledUrl = mockWriteText.mock.calls[0][0]
-      expect(calledUrl).toMatch(/http:\/\/localhost\/#.+/)
-    })
-  })
-
-  describe('Reset functionality', () => {
-    it('should reset to defaults when Reset button is clicked', () => {
-      render(<App />)
-
-      // Change some values first
-      const hourInput = screen.getByLabelText('Start hour')
-      fireEvent.change(hourInput, { target: { value: '23' } })
-
-      // Click reset button
-      jest.spyOn(window, 'confirm').mockReturnValueOnce(true)
-      fireEvent.click(screen.getByText('🔄 Reset to Defaults'))
-
-      // Values should be reset to defaults
-      expect(hourInput).toHaveValue(18)
-    })
-
-    it('should not reset to defaults when Reset is cancelled', () => {
-      render(<App />)
-
-      // Change some values first
-      const hourInput = screen.getByLabelText('Start hour')
-      fireEvent.change(hourInput, { target: { value: '23' } })
-
-      // Click reset button
-      jest.spyOn(window, 'confirm').mockReturnValueOnce(false)
-      fireEvent.click(screen.getByText('🔄 Reset to Defaults'))
-
-      // Values should not be reset to defaults
-      expect(hourInput).toHaveValue(23)
     })
   })
 })

@@ -1,24 +1,39 @@
 import { useEffect, useState } from 'react'
 
-import { SlotEditorProps } from '@/types'
+import { useApp } from '@/context/AppContext'
 import { parseIntOrZero } from '@/utils/numberUtils'
 import { formatTime } from '@/utils/timeUtils'
 
 import Button from '../Button/Button'
 import './SlotEditor.css'
 
-const SlotEditor: React.FC<SlotEditorProps> = ({
-  slot,
-  slotIndex,
-  timeFormat,
-  onSave,
-  onDelete,
-  onInsert,
-  onClose,
-}) => {
-  const [special, setSpecial] = useState(slot.special)
-  const [raffles, setRaffles] = useState(slot.raffles)
-  const [duration, setDuration] = useState(slot.duration)
+const SlotEditor: React.FC = () => {
+  const {
+    editingSlot: slotIndex,
+    setEditingSlot,
+    slots,
+    timeFormat,
+    updateSlotConfig,
+    deleteSlot,
+    insertSlot,
+  } = useApp()
+
+  const slot = slotIndex !== null ? slots[slotIndex] : null
+
+  const [special, setSpecial] = useState(slot?.special)
+  const [raffles, setRaffles] = useState(slot?.raffles)
+  const [duration, setDuration] = useState(slot?.duration)
+
+  // Sync local state when slot changes
+  useEffect(() => {
+    if (slot) {
+      setSpecial(slot.special)
+      setRaffles(slot.raffles)
+      setDuration(slot.duration)
+    }
+  }, [slot])
+
+  const onClose = () => setEditingSlot(null)
 
   // Close modal on Escape key press
   useEffect(() => {
@@ -32,27 +47,32 @@ const SlotEditor: React.FC<SlotEditorProps> = ({
     return () => {
       document.removeEventListener('keydown', handleEscape)
     }
-  }, [onClose])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (slotIndex === null || !slot) return null
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(slotIndex, { special, raffles, duration })
+    updateSlotConfig(slotIndex, { special, raffles, duration })
   }
 
   const handleClear = () => {
-    onSave(slotIndex, {})
+    updateSlotConfig(slotIndex, {})
   }
 
   const handleDelete = () => {
-    confirm('Are you sure you want to delete this slot?') && onDelete(slotIndex)
+    if (confirm('Are you sure you want to delete this slot?')) {
+      deleteSlot(slotIndex)
+    }
   }
 
   const handleInsertAbove = () => {
-    onInsert(slotIndex, 'above')
+    insertSlot(slotIndex, 'above')
   }
 
   const handleInsertBelow = () => {
-    onInsert(slotIndex, 'below')
+    insertSlot(slotIndex, 'below')
   }
 
   return (

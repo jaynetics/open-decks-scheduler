@@ -1,35 +1,14 @@
-import { SidebarProps, TimeFormat } from '@/types'
+import { useApp } from '@/context/AppContext'
+import { TimeFormat } from '@/types'
 import { parseIntOrZero } from '@/utils/numberUtils'
+import { RaffleWarning } from '@/utils/raffleUtils'
 
 import Button from '../Button/Button'
 import './Sidebar.css'
 
-const Sidebar: React.FC<SidebarProps> = ({
-  numSlots,
-  onAutoAssignRaffles,
-  onSlotDefaultDurationChange,
-  onHideSettings,
-  onNumSlotsChange,
-  onPrint,
-  onReset,
-  onShare,
-  onSlotBorderChange,
-  onSlotBorderBrightnessChange,
-  onSlotHeightChange,
-  onSlotRoundnessChange,
-  onStartHourChange,
-  onStartMinuteChange,
-  onTimeFormatChange,
-  raffleWarning,
-  slotBorder,
-  slotBorderBrightness,
-  slotDefaultDuration,
-  slotHeight,
-  slotRoundness,
-  startHour,
-  startMinute,
-  timeFormat,
-}) => {
+const Sidebar: React.FC = () => {
+  const app = useApp()
+
   return (
     <div className="ui sidebar">
       <h3>Open Decks Scheduler</h3>
@@ -40,9 +19,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           <input
             type="number"
             min="0"
-            max={timeFormat === '24h' ? 23 : 12}
-            value={startHour}
-            onChange={(e) => onStartHourChange(parseInt(e.target.value))}
+            max={app.timeFormat === '24h' ? 23 : 12}
+            value={app.startHour}
+            onChange={(e) => app.setStartHour(parseInt(e.target.value))}
             className="time-input"
             aria-label="Start hour"
           />
@@ -51,15 +30,15 @@ const Sidebar: React.FC<SidebarProps> = ({
             type="number"
             min="0"
             max="59"
-            value={startMinute}
-            onChange={(e) => onStartMinuteChange(parseInt(e.target.value))}
+            value={app.startMinute}
+            onChange={(e) => app.setStartMinute(parseInt(e.target.value))}
             className="time-input"
             aria-label="Start minute"
           />
           @
           <select
-            value={timeFormat}
-            onChange={(e) => onTimeFormatChange(e.target.value as TimeFormat)}
+            value={app.timeFormat}
+            onChange={(e) => app.setTimeFormat(e.target.value as TimeFormat)}
             className="time-format-select"
             aria-label="Time format"
           >
@@ -76,8 +55,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           type="number"
           min="1"
           max="30"
-          value={numSlots}
-          onChange={(e) => onNumSlotsChange(parseIntOrZero(e.target.value))}
+          value={app.slotConfigs.length}
+          onChange={(e) => app.handleNumSlotsChange(parseIntOrZero(e.target.value))}
         />
       </div>
 
@@ -88,8 +67,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           type="number"
           min="0"
           max="120"
-          value={slotDefaultDuration}
-          onChange={(e) => onSlotDefaultDurationChange(parseIntOrZero(e.target.value))}
+          value={app.slotDefaultDuration}
+          onChange={(e) => app.setSlotDefaultDuration(parseIntOrZero(e.target.value))}
         />
       </div>
 
@@ -100,8 +79,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           type="number"
           min="10"
           max="300"
-          value={slotHeight}
-          onChange={(e) => onSlotHeightChange(parseIntOrZero(e.target.value))}
+          value={app.slotHeight}
+          onChange={(e) => app.setSlotHeight(parseIntOrZero(e.target.value))}
         />
       </div>
 
@@ -115,8 +94,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             type="number"
             min="0"
             max="1000"
-            value={slotBorder}
-            onChange={(e) => onSlotBorderChange(parseIntOrZero(e.target.value))}
+            value={app.slotBorder}
+            onChange={(e) => app.setSlotBorder(parseIntOrZero(e.target.value))}
           />
           ╭
           <input
@@ -125,8 +104,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             type="number"
             min="0"
             max="1000"
-            value={slotRoundness}
-            onChange={(e) => onSlotRoundnessChange(parseIntOrZero(e.target.value))}
+            value={app.slotRoundness}
+            onChange={(e) => app.setSlotRoundness(parseIntOrZero(e.target.value))}
           />
           ☼
           <input
@@ -135,19 +114,19 @@ const Sidebar: React.FC<SidebarProps> = ({
             type="number"
             min="0"
             max="15"
-            value={slotBorderBrightness}
-            onChange={(e) => onSlotBorderBrightnessChange(parseIntOrZero(e.target.value))}
+            value={app.slotBorderBrightness}
+            onChange={(e) => app.setSlotBorderBrightness(parseIntOrZero(e.target.value))}
           />
         </div>
       </div>
 
-      <Button color="pink" text="🎲 Auto-assign Raffles" onClick={onAutoAssignRaffles} />
-      <Button color="purple" text="🖨️ Print Schedule" onClick={onPrint} />
-      <Button color="purple" text="🔗 Share Schedule" onClick={onShare} />
-      <Button color="orange" text="🔄 Reset to Defaults" onClick={onReset} />
-      <Button color="gray" text="Hide Settings" onClick={onHideSettings} />
+      <Button color="pink" text="🎲 Auto-assign Raffles" onClick={app.autoAssignRaffles} />
+      <Button color="purple" text="🖨️ Print Schedule" onClick={() => window.print()} />
+      <Button color="purple" text="🔗 Share Schedule" onClick={app.handleShare} />
+      <Button color="orange" text="🔄 Reset to Defaults" onClick={app.handleReset} />
+      <Button color="gray" text="Hide Settings" onClick={() => app.setShowSettings(false)} />
 
-      {raffleWarning}
+      <RaffleWarning slots={app.slots} />
 
       <a href="http://github.com/jaynetics/open-decks-scheduler">Source code</a>
     </div>
